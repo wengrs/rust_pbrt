@@ -1,5 +1,6 @@
 use std::ops;
 use std::cmp;
+use crate::vector::Vec3d;
 
 #[derive(Clone, Debug)]
 pub struct Matrix4
@@ -119,5 +120,77 @@ impl cmp::PartialEq for Matrix4
             }
         }
         true
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct Transform
+{
+    pub m: Matrix4,
+    pub m_inv: Matrix4,
+}
+
+impl Transform
+{
+    pub fn new(m: &Matrix4) -> Transform
+    {
+        Transform{ m:m.clone(), m_inv:Matrix4::inv(m) }
+    }
+    pub fn translate(delta: Vec3d) -> Transform
+    {
+        let mat = [ [1., 0., 0., delta.x], 
+                    [0., 1., 0., delta.y], 
+                    [0., 0., 1., delta.z], 
+                    [0., 0., 0., 1.]];
+        Transform::new(&(Matrix4::new_and_move(mat)))
+    }
+    pub fn scale(x: f64, y: f64, z: f64) -> Transform
+    {
+        let mat = [ [x,     0.,     0.,     0.], 
+                    [0.,    y,      0.,     0.], 
+                    [0.,    0.,     z,      0.], 
+                    [0.,    0.,     0.,     1.]];
+        Transform::new(&(Matrix4::new_and_move(mat)))       
+    }
+    pub fn rotate_x(t: f64) -> Transform
+    {
+        let mat = [ [1.,    0.,     0.,         0.], 
+                    [0.,    t.cos(),-t.sin(),   0.], 
+                    [0.,    t.sin(), t.cos(),   0.], 
+                    [0.,    0.,     0.,         1.]];
+        Transform::new(&(Matrix4::new_and_move(mat)))       
+    }
+    pub fn rotate_y(t: f64) -> Transform
+    {
+        let mat = [ [ t.cos(),  0.,     t.sin(),    0.], 
+                    [0.,        1.,     0.,         0.], 
+                    [-t.sin(),  0.,     t.cos(),    0.], 
+                    [0.,        0.,     0.,         1.]];
+        Transform::new(&(Matrix4::new_and_move(mat)))       
+    }
+    pub fn rotate_z(t: f64) -> Transform
+    {
+        let mat = [ [t.cos(),   -t.sin(),   0.,     0.], 
+                    [t.sin(),    t.cos(),   0.,     0.], 
+                    [0.,        0.,         1.,     0.], 
+                    [0.,        0.,         0.,     1.]];
+        Transform::new(&(Matrix4::new_and_move(mat)))       
+    }
+    pub fn rotate(t: f64, axis: Vec3d) -> Transform
+    {
+        let (c, s) = (t.cos(), t.sin());
+        let (ux, uy, uz) = (axis.x, axis.y, axis.z);
+        let mut mat = [[0.; 4]; 4];
+        mat[0][0] = c+ux*ux*(1.-c);
+        mat[0][1] = ux*uy*(1.-c)-uz*s;
+        mat[0][2] = ux*uz*(1.-c)+uy*s;
+        mat[1][0] = uy*ux*(1.-c)+uz*s;
+        mat[1][1] = c+uy*uy*(1.-c);
+        mat[1][2] = uy*uz*(1.-c)-ux*s;
+        mat[2][0] = uz*ux*(1.-c)-uy*s;
+        mat[2][1] = uz*uy*(1.-c)+ux*s;
+        mat[2][2] = c+uz*uz*(1.-c);
+        mat[3][3] = 1.;
+        Transform::new(&(Matrix4::new_and_move(mat)))   
     }
 }
