@@ -31,15 +31,15 @@ mod matrix_tests{
     use rand::distributions::Distribution;
     #[test]
     fn mul_test_0(){
-        let m1 = Matrix4::new([ [3., 5., 2., 1.], 
+        let m1 = Matrix4::new(&[[3., 5., 2., 1.], 
                                 [6., 1., 8., 4.], 
                                 [7., 3., 5., 1.], 
                                 [7., 9., 9., 9.]]);
-        let m2 = Matrix4::new([ [1., 1., 4., 2.],
+        let m2 = Matrix4::new(&[[1., 1., 4., 2.],
                                 [7., 4., 9., 2.],
                                 [8., 3., 2., 8.],
                                 [8., 8., 3., 6.]]);
-        let m3 = Matrix4::new([ [62.,   37.,    64.,    38.], 
+        let m3 = Matrix4::new(&[[62.,   37.,    64.,    38.], 
                                 [109.,  66.,    61.,    102.], 
                                 [76.,   42.,    68.,    66.], 
                                 [214.,  142.,   154.,   158.]]);                  
@@ -48,7 +48,7 @@ mod matrix_tests{
     #[test]
     fn inv_test_0(){
         let mut rng = rand::thread_rng();
-        let dice = Uniform::from(0..100);
+        let dice = Uniform::from(0. ..100.);
         let i = Matrix4::i();
         for _ in 0..1000
         {
@@ -57,10 +57,10 @@ mod matrix_tests{
             {
                 for j in 0..4
                 {
-                    v[i][j] = dice.sample(&mut rng) as f64;
+                    v[i][j] = dice.sample(&mut rng);
                 }
             }
-            let m = Matrix4::new(v);
+            let m = Matrix4::new(&v);
             let m_inv = Matrix4::inv(&m);
             assert_eq!(Matrix4::mul(&m, &m_inv), i);
         }

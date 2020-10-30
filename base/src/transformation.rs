@@ -16,9 +16,13 @@ impl Matrix4
         {
             mat[i][i] = 1.;
         }
-        Matrix4::new(mat)
+        Matrix4::new_and_move(mat)
     }
-    pub fn new(m: [[f64; 4]; 4]) -> Matrix4
+    pub fn new(m: &[[f64; 4]; 4]) -> Matrix4
+    {
+        Matrix4 {mat: m.clone()}
+    }
+    pub fn new_and_move(m: [[f64; 4]; 4]) -> Matrix4
     {
         Matrix4 {mat: m}
     }
@@ -32,7 +36,7 @@ impl Matrix4
                 mat[i][j] = m1[(i,0)]*m2[(0,j)] + m1[(i,1)]*m2[(1,j)] + m1[(i,2)]*m2[(2,j)] + m1[(i,3)]*m2[(3,j)];
             }
         }
-        Matrix4::new(mat)
+        Matrix4::new_and_move(mat)
     }
     pub fn inv(matrix: &Matrix4) -> Matrix4
     {
@@ -87,7 +91,7 @@ impl Matrix4
             }
             k += 1;
         }
-        Matrix4::new(v)
+        Matrix4::new_and_move(v)
     }
 }
 
