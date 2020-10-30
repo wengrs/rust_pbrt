@@ -39,14 +39,14 @@ impl Matrix4
         }
         Matrix4::new_and_move(mat)
     }
-    pub fn inv(matrix: &Matrix4) -> Matrix4
+    pub fn inv(&self) -> Matrix4
     {
         let mut v = [[0.; 4]; 4];
         for i in 0..4
         {
             v[i][i] = 1.;
         }
-        let mut m = matrix.mat.clone();
+        let mut m = self.mat.clone();
         let mut k = 0;
         while k < 4
         {
@@ -134,7 +134,11 @@ impl Transform
 {
     pub fn new(m: &Matrix4) -> Transform
     {
-        Transform{ m:m.clone(), m_inv:Matrix4::inv(m) }
+        Transform{ m:m.clone(), m_inv:m.inv() }
+    }
+    pub fn inv(&self) -> Transform
+    {
+        Transform{ m: self.m_inv.clone(), m_inv:self.m.clone() }
     }
     pub fn translate(delta: Vec3d) -> Transform
     {

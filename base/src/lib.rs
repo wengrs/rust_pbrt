@@ -61,7 +61,7 @@ mod matrix_tests{
                 }
             }
             let m = Matrix4::new(&v);
-            let m_inv = Matrix4::inv(&m);
+            let m_inv = m.inv();
             assert_eq!(Matrix4::mul(&m, &m_inv), i);
         }
     }
