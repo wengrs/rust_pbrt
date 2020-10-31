@@ -197,4 +197,27 @@ impl Transform
         mat[3][3] = 1.;
         Transform::new(&(Matrix4::new_and_move(mat)))   
     }
+    pub fn look_at(pos: Vec3d, look: Vec3d, up: Vec3d) -> Transform
+    {
+        let mut c_to_w = [[0.; 4]; 4];
+        c_to_w[0][3] = pos.x;
+        c_to_w[1][3] = pos.y;
+        c_to_w[2][3] = pos.z;
+        c_to_w[3][3] = 1.;
+        let dir = (look - pos).norm();
+        let left = Vec3d::cross(up.norm(), dir).norm();
+        let new_up = Vec3d::cross(dir, left);
+        c_to_w[0][0] = left.x;
+        c_to_w[1][0] = left.y;
+        c_to_w[2][0] = left.z;
+        c_to_w[0][1] = new_up.x;
+        c_to_w[1][1] = new_up.y;
+        c_to_w[2][1] = new_up.z;
+        c_to_w[0][2] = dir.x;
+        c_to_w[1][2] = dir.y;
+        c_to_w[2][2] = dir.z; 
+        let c_to_w = Matrix4::new_and_move(c_to_w);     
+        let w_to_c = c_to_w.inv();
+        Transform{ m: w_to_c, m_inv: c_to_w}  
+    }
 }
