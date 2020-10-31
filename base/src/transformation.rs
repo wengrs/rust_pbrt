@@ -220,4 +220,8 @@ impl Transform
         let w_to_c = c_to_w.inv();
         Transform{ m: w_to_c, m_inv: c_to_w}  
     }
+    pub fn mul(t1: &Transform, t2: &Transform) -> Transform
+    {
+        Transform{ m:Matrix4::mul(&t1.m, &t2.m), m_inv:Matrix4::mul(&t2.m_inv, &t1.m_inv) }
+    }
 }
