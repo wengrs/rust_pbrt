@@ -1,6 +1,7 @@
 use std::ops;
 use std::cmp;
 use crate::vector::Vec3d;
+use crate::ray::Ray;
 
 #[derive(Clone, Debug)]
 pub struct Matrix4
@@ -223,5 +224,38 @@ impl Transform
     pub fn mul(t1: &Transform, t2: &Transform) -> Transform
     {
         Transform{ m:Matrix4::mul(&t1.m, &t2.m), m_inv:Matrix4::mul(&t2.m_inv, &t1.m_inv) }
+    }
+    pub fn swap_handedness(&self) -> bool
+    {
+        let det =   self.m[(0,0)] * (self.m[(1,1)]*self.m[(2,2)] - self.m[(1,2)]*self.m[(2,1)]) - 
+                    self.m[(0,1)] * (self.m[(1,0)]*self.m[(2,2)] - self.m[(1,2)]*self.m[(2,0)]) + 
+                    self.m[(0,2)] * (self.m[(1,0)]*self.m[(2,1)] - self.m[(1,1)]*self.m[(2,0)]);
+        det < 0.
+    }
+    pub fn act_point(&self, p: Vec3d) -> Vec3d
+    {
+        let w = p.x*self.m[(3,0)] + p.y*self.m[(3,1)] + p.z*self.m[(3,2)] + self.m[(3,3)];
+        let x = (p.x*self.m[(0,0)] + p.y*self.m[(0,1)] + p.z*self.m[(0,2)] + self.m[(0,3)]) / w;
+        let y = (p.x*self.m[(1,0)] + p.y*self.m[(1,1)] + p.z*self.m[(1,2)] + self.m[(1,3)]) / w;
+        let z = (p.x*self.m[(2,0)] + p.y*self.m[(2,1)] + p.z*self.m[(2,2)] + self.m[(2,3)]) / w;
+        Vec3d::new(x, y, z)
+    }
+    pub fn act_vector(&self, p: Vec3d) -> Vec3d
+    {
+        let x = p.x*self.m[(0,0)] + p.y*self.m[(0,1)] + p.z*self.m[(0,2)];
+        let y = p.x*self.m[(1,0)] + p.y*self.m[(1,1)] + p.z*self.m[(1,2)];
+        let z = p.x*self.m[(2,0)] + p.y*self.m[(2,1)] + p.z*self.m[(2,2)];
+        Vec3d::new(x, y, z)        
+    }
+    pub fn act_normal(&self, p: Vec3d) -> Vec3d
+    {
+        let x = p.x*self.m_inv[(0,0)] + p.y*self.m_inv[(0,1)] + p.z*self.m_inv[(0,2)];
+        let y = p.x*self.m_inv[(1,0)] + p.y*self.m_inv[(1,1)] + p.z*self.m_inv[(1,2)];
+        let z = p.x*self.m_inv[(2,0)] + p.y*self.m_inv[(2,1)] + p.z*self.m_inv[(2,2)];
+        Vec3d::new(x, y, z)         
+    }
+    pub fn act_ray(&self, r: &Ray) -> Ray
+    {
+        Ray{ o: self.act_point(r.o), d:self.act_vector(r.d), ..*r }
     }
 }
