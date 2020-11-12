@@ -2,6 +2,7 @@ pub mod vector;
 pub mod ray;
 pub mod bounding;
 pub mod transformation;
+pub mod solver;
 
 #[cfg(test)]
 mod aabb_tests {
