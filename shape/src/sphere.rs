@@ -9,8 +9,8 @@ pub struct Sphere
     pub r: f64,
     pub z_min: f64,
     pub z_max: f64,
-    pub t_min: f64,
-    pub t_max: f64,
+    pub theta_min: f64,
+    pub theta_max: f64,
     pub phi_max: f64,
 }
 
@@ -29,6 +29,12 @@ impl Shape for Sphere
         for t in &self.world_to_obj
         {
             r = t.act_ray(&r);
+        }
+        // AABB check
+        let aabb = self.bound();
+        if !aabb.hit(&ray)
+        {
+            return Interaction::miss();
         }
         // Compute quadratic sphere coefficients
         let a = r.d.x*r.d.x + r.d.y*r.d.y + r.d.z*r.d.z;
@@ -49,7 +55,19 @@ impl Shape for Sphere
         {
             t_hit = t0;
         }
-        
-        Interaction::miss()
+        // Compute sphere hit position
+        let p_hit = r.pos(t_hit);
+        let mut phi = p_hit.y.atan2(p_hit.x);
+        if phi < 0.
+        { 
+            phi += 2.*std::f64::consts::PI;
+        }
+        // Test sphere intersection against clipping parameters
+        if p_hit.z < self.z_min || p_hit.z > self.z_max || phi > self.phi_max
+        {
+            return Interaction::miss();
+        }
+        let n_hit = p_hit.norm();
+        Interaction { hit:true, p_hit, t_hit, n_hit}
     }
 }

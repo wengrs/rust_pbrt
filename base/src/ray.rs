@@ -27,4 +27,8 @@ impl Ray
         }
         Ray { o:o, d:d, t:r.t, tmax:r.tmax}
     }
+    pub fn pos(&self, t:f64) -> Vec3d
+    {
+        self.o + t*self.d
+    }
 }
