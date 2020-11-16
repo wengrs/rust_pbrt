@@ -5,6 +5,7 @@ use crate::shape::Interaction;
 
 pub struct Cylinder
 {
+    pub obj_to_world: Vec<Transform>,
     pub world_to_obj: Vec<Transform>,
     pub r: f64,
     pub z_min: f64,
@@ -34,6 +35,7 @@ impl Shape for Cylinder
         let a = r.d.x*r.d.x + r.d.y*r.d.y;
         let b = 2.*(r.d.x*r.o.x + r.d.y*r.o.y);
         let c = r.o.x*r.o.x + r.o.y*r.o.y + self.r*self.r;
+        let (solved, t0, t1) = base::solver::quadratic(a, b, c);
         if !solved || t0 > r.tmax || t1 < 0.
         {
             return Interaction::miss();
@@ -57,7 +59,12 @@ impl Shape for Cylinder
         {
             return Interaction::miss();
         }
-        let n_hit = Vec3d{ x:p_hit.x, y:p_hit.y, z:0 }
+        let mut n_hit = base::vector::Vec3d{ x:p_hit.x, y:p_hit.y, z:0. };
+        for t in &self.obj_to_world
+        {
+            n_hit = t.act_normal(n_hit);
+        }
+        n_hit = n_hit.norm();
         Interaction { hit:true, t_hit, n_hit}
     }
 }

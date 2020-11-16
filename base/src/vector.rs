@@ -33,6 +33,13 @@ impl Vec3d
         let z = v1.x*v2.y - v1.y*v2.x;
         Vec3d{ x, y, z }
     }
+    pub fn abs(self) -> Vec3d
+    {
+        let x = f64::abs(self.x);
+        let y = f64::abs(self.y);
+        let z = f64::abs(self.z);
+        Vec3d{ x, y, z }
+    }
     pub fn lensq(self) -> f64
     {
         self.x*self.x + self.y*self.y + self.z*self.z
@@ -52,6 +59,21 @@ impl Vec3d
     pub fn max_comp(self) -> f64
     {
         f64::max(self.x, f64::max(self.y, self.z))
+    }
+    pub fn max_dim(self) -> usize
+    {
+        if self.x > self.y && self.x > self.z
+        {
+            return 0;
+        }
+        else if self.y > self.x && self.y > self.z
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
     }
     pub fn comp_min(v1: Vec3d, v2: Vec3d) -> Vec3d
     {

@@ -5,6 +5,7 @@ use crate::shape::Interaction;
 
 pub struct Sphere
 {
+    pub obj_to_world: Vec<Transform>,
     pub world_to_obj: Vec<Transform>,
     pub r: f64,
     pub z_min: f64,
@@ -67,7 +68,12 @@ impl Shape for Sphere
         {
             return Interaction::miss();
         }
-        let n_hit = p_hit.norm();
+        let mut n_hit = p_hit;
+        for t in &self.obj_to_world
+        {
+            n_hit = t.act_normal(n_hit);
+        }
+        n_hit = n_hit.norm();
         Interaction { hit:true, t_hit, n_hit}
     }
 }
