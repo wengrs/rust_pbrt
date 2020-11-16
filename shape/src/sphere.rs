@@ -68,6 +68,6 @@ impl Shape for Sphere
             return Interaction::miss();
         }
         let n_hit = p_hit.norm();
-        Interaction { hit:true, p_hit, t_hit, n_hit}
+        Interaction { hit:true, t_hit, n_hit}
     }
 }

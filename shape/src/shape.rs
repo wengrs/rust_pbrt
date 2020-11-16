@@ -10,7 +10,6 @@ pub trait Shape
 pub struct Interaction
 {
     pub hit: bool,
-    pub p_hit: Vec3d,
     pub t_hit: f64,
     pub n_hit: Vec3d,
 }
@@ -19,6 +18,6 @@ impl Interaction
 {
     pub fn miss() -> Interaction
     {
-        Interaction{ hit:false, p_hit:Vec3d::zero(), t_hit:0., n_hit:Vec3d::zero() }
+        Interaction{ hit:false, t_hit:0., n_hit:Vec3d::zero() }
     }
 }
