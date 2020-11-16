@@ -67,6 +67,10 @@ impl Vec3d
         let z = f64::max(v1.z, v2.z);
         Vec3d{ x, y, z}
     }
+    pub fn permute(&self, i0: usize, i1: usize, i2: usize) -> Vec3d
+    {
+        Vec3d::new(self[i0], self[i1], self[i2])
+    }
 }
 
 impl ops::Add for Vec3d
@@ -120,5 +124,19 @@ impl ops::Neg for Vec3d
     fn neg(self) -> Vec3d
     {
         Vec3d{ x: -self.x, y: -self.y, z: -self.z }
+    }
+}
+
+impl ops::Index<usize> for Vec3d
+{
+    type Output = f64;
+    fn index(&self, i: usize) -> &f64
+    {
+        match i 
+        {
+            0 => &self.x,
+            1 => &self.y,
+            _ => &self.z,
+        }
     }
 }

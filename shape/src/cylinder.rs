@@ -58,6 +58,6 @@ impl Shape for Cylinder
             return Interaction::miss();
         }
         let n_hit = Vec3d{ x:p_hit.x, y:p_hit.y, z:0 }
-        Interaction { hit:true, p_hit, t_hit, n_hit}
+        Interaction { hit:true, t_hit, n_hit}
     }
 }
