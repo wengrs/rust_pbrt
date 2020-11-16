@@ -5,5 +5,5 @@ cd shape
 cargo clean
 cd ..
 git add *
-git commit -m "something"
+git commit -m $(Get-Date)
 git push origin master
