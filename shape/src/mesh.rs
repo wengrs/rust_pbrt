@@ -1,8 +1,77 @@
 use base::transformation::Transform;
 use base::bounding::AABB;
 use base::vector::Vec3d;
+use base::ray::Ray;
 use crate::shape::Shape;
 use crate::shape::Interaction;
+
+pub struct Mesh
+{
+    pub obj_to_world: Vec<Transform>,
+    pub world_to_obj: Vec<Transform>,
+    pub bouding_box: AABB,
+    pub vertex_indices: Vec<usize>,
+    pub vertices: Vec<Vec3d>,
+}
+
+impl Shape for Mesh
+{
+    fn bound(&self) -> AABB
+    {
+        self.bouding_box.clone()
+    }
+    fn intersect(&self, ray: &Ray) -> Interaction
+    {
+        // AABB check
+        let mut ray_obj = ray.clone();
+        for t in &self.world_to_obj
+        {
+            ray_obj = t.act_ray(&ray_obj);
+        }
+        let aabb = self.bound();
+        if !aabb.hit(&ray_obj)
+        {
+            return Interaction::miss();
+        }        
+        // Transform vertices to world coordinate
+        let mut v_world: Vec<Vec3d> = Vec::with_capacity(self.vertices.len());
+        let mut i = 0;
+        for v in &self.vertices
+        {
+            let mut vt = v.clone();
+            for t in &self.obj_to_world
+            {
+                vt = t.act_point(vt);
+            }
+            v_world[i] = vt;
+            i += 1;
+        }
+        let num_tri = self.vertex_indices.len() / 3;
+        let mut t_hit = f64::INFINITY;
+        let mut n_hit = Vec3d::zero();
+        for i in 0..num_tri
+        {
+            let p0 = v_world[self.vertex_indices[3*i]];
+            let p1 = v_world[self.vertex_indices[3*i+1]];
+            let p2 = v_world[self.vertex_indices[3*i+2]];
+            let tri = Triangle{ p0, p1, p2 };
+            let inter = tri.intersect(ray);
+            if inter.hit && inter.t_hit < t_hit
+            {
+                t_hit = inter.t_hit;
+                n_hit = inter.n_hit;
+            }
+        }
+        if t_hit == f64::INFINITY
+        {
+            return Interaction::miss();
+        }
+        else
+        {
+            return Interaction{ hit: true, t_hit, n_hit };
+        }
+    }
+}
 
 pub struct Triangle
 {
@@ -17,7 +86,7 @@ impl Shape for Triangle
     {
         AABB::union_point(&AABB::new(self.p0, self.p1), self.p2)
     }
-    fn intersect(&self, ray: &base::ray::Ray) -> Interaction
+    fn intersect(&self, ray: &Ray) -> Interaction
     {
         // Both ray and tri is in world coordinate
         // AABB check
