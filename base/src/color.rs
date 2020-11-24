@@ -1,5 +1,3 @@
-use std::num;
-
 #[derive(Clone, Copy, Debug)]
 pub struct RGB
 {
