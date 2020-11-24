@@ -3,6 +3,7 @@ pub mod ray;
 pub mod bounding;
 pub mod transformation;
 pub mod solver;
+pub mod color;
 
 #[cfg(test)]
 mod aabb_tests {
